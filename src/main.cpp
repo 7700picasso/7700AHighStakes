@@ -16,12 +16,12 @@ competition Competition;
 
 brain Brain; 
 
-motor intake = motor(PORT10, ratio6_1, false); 
+motor intake = motor(PORT10, ratio6_1, false);  
 motor hook = motor(PORT3, ratio6_1, true);
-motor LF = motor(PORT6, ratio6_1, false);
-motor LB = motor(PORT2, ratio6_1, false);
+motor LF = motor(PORT5, ratio6_1, true);
+motor LB = motor(PORT2, ratio6_1, true);
 motor RF = motor(PORT19, ratio6_1, false);
-motor RB = motor(PORT16, ratio6_1, false);
+motor RB = motor(PORT21, ratio6_1, false);
 
 controller Controller1; 
 
@@ -41,6 +41,15 @@ void driveRobot(float rspeed, float lspeed, int wt) {
     wait(wt, msec); 
 
 }
+
+void driveBrake() { 
+  LF.stop(brake); 
+  LB.stop(brake); 
+  RF.stop(brake); 
+  RB.stop(brake); 
+}
+
+
 /*---------------------------------------------------------------------------*/
 
 
@@ -62,7 +71,9 @@ void pre_auton(void) {
 
 void autonomous(void) {
   // ..........................................................................
-  // Insert autonomous user code here.
+  driveRobot(20, 20, 2000); 
+  driveBrake(); 
+
   // ..........................................................................
 }
 
