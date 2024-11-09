@@ -22,6 +22,8 @@ motor LF = motor(PORT5, ratio6_1, true);
 motor LB = motor(PORT2, ratio6_1, true);
 motor RF = motor(PORT19, ratio6_1, false);
 motor RB = motor(PORT21, ratio6_1, false);
+inertial Gyro = inertial (PORT6);
+
 
 controller Controller1; 
 
@@ -160,14 +162,64 @@ void Display()
 	}
 }
 
+// Gyro Codes 
+void gyroPrint()
+{
+	float heading = Gyro.rotation(deg);
+	Brain.Screen.printAt(1, 60, "heading  =  %.2f. degrees", heading);
+}
+
+
+void gyroTurn(float target)
+{
+		float heading=0.0; //initialize a variable for heading
+		float accuracy=2.0; //how accurate to make the turn in degrees
+		float error=target-heading;
+		float kp=0.5;
+		float speed=kp*error;
+		Gyro.setRotation(0.0, degrees);  //reset Gyro to zero degrees
+		
+		while(fabs(error)>=accuracy)
+		{
+			speed=kp*error;
+			driveRobot(-speed, speed, 10); //turn right at speed
+			heading=Gyro.rotation();  //measure the heading of the robot
+			error=target-heading;  //calculate error
+		}
+			driveBrake();  //stope the drive
+}
+
+void inchDriveP(float target){
+  float x=0;
+  float error=target;
+  float kp=2.2;
+  float speed =kp*error;
+  float accuracy=0.25;
+  float Dia = 3.25; //inches
+  float Gr = 0.6; //(36Teeth / 60Teeth)
+LF.setPosition(0.0, rev);
+
+while(fabs(error)>accuracy){
+driveRobot(speed,speed,10);
+x=LF.position(rev)*M_PI*Dia*Gr; //pie = 3.14   Diameter=3.25   Gr=GearRatio=0.6
+error=target-x;
+speed=kp*error;
+}
+
+driveBrake();
+}
+
+
+
 
 /*---------------------------------------------------------------------------*/
 
 
 void pre_auton(void) {
 
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
+ while (Gyro.isCalibrating()){ 
+  wait(100, msec);
+ }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -184,6 +236,22 @@ void autonomous(void) {
   // ..........................................................................
   // driveRobot(20, 20, 2000); 
   // driveBrake(); 
+  //inchDriveP(20); 
+
+  inchDriveP(-18);
+  gyroTurn(-40); 
+  inchDriveP(-10); 
+  clamp.set(true); 
+  wait(1000, msec); 
+  hook.spin(reverse, 70, pct); 
+  wait(1500, msec); 
+  gyroTurn(150); 
+  driveRobot(50, 50, 1500); 
+  driveBrake(); 
+  hook.stop(); 
+
+  
+
 
   // ..........................................................................
 }
@@ -219,8 +287,8 @@ void usercontrol(void) {
     }
 
     if (Controller1.ButtonR1.pressing()){ 
-      intake.spin(fwd, 90, pct); 
-      hook.spin(fwd,90, pct ); 
+      intake.spin(fwd, 0, pct); 
+      hook.spin(fwd,40, pct ); 
     }
     
       else if (Controller1.ButtonR2.pressing()){ 
