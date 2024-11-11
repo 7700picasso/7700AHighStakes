@@ -175,7 +175,7 @@ void gyroTurn(float target)
 		float heading=0.0; //initialize a variable for heading
 		float accuracy=2.0; //how accurate to make the turn in degrees
 		float error=target-heading;
-		float kp=0.5;
+		float kp=3;
 		float speed=kp*error;
 		Gyro.setRotation(0.0, degrees);  //reset Gyro to zero degrees
 		
@@ -192,9 +192,9 @@ void gyroTurn(float target)
 void inchDriveP(float target){
   float x=0;
   float error=target;
-  float kp=2.2;
+  float kp=5;
   float speed =kp*error;
-  float accuracy=0.25;
+  float accuracy=2.8;
   float Dia = 3.25; //inches
   float Gr = 0.6; //(36Teeth / 60Teeth)
 LF.setPosition(0.0, rev);
@@ -246,7 +246,7 @@ void autonomous(void) {
   hook.spin(reverse, 70, pct); 
   wait(1500, msec); 
   gyroTurn(150); 
-  driveRobot(50, 50, 1500); 
+  driveRobot(50, 50, 150); 
   driveBrake(); 
   hook.stop(); 
 
