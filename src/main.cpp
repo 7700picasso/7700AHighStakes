@@ -22,7 +22,7 @@ motor LF = motor(PORT5, ratio6_1, true);
 motor LB = motor(PORT2, ratio6_1, true);
 motor RF = motor(PORT19, ratio6_1, false);
 motor RB = motor(PORT21, ratio6_1, false);
-inertial Gyro = inertial (PORT6);
+inertial Gyro = inertial (PORT7);
 
 
 controller Controller1; 
@@ -172,15 +172,14 @@ void gyroPrint()
 
 void gyroTurn(float target)
 {
-    Gyro.setRotation(0.0, degrees);  //reset Gyro to zero degrees
 		float heading=0.0; //initialize a variable for heading
 		float accuracy=2.0; //how accurate to make the turn in degrees
 		float error=target-heading;
-		float kp=3;
+		float kp=2.55;//3
 		float speed=kp*error;
+		Gyro.setRotation(0.0, degrees);  //reset Gyro to zero degrees
 		
-		
-		while(fabs(error)>=accuracy)
+		while(fabs(error)>accuracy)
 		{
 			speed=kp*error;
 			driveRobot(-speed, speed, 10); //turn right at speed
