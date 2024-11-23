@@ -172,12 +172,13 @@ void gyroPrint()
 
 void gyroTurn(float target)
 {
+    Gyro.setRotation(0.0, degrees);  //reset Gyro to zero degrees
 		float heading=0.0; //initialize a variable for heading
 		float accuracy=2.0; //how accurate to make the turn in degrees
 		float error=target-heading;
 		float kp=3;
 		float speed=kp*error;
-		Gyro.setRotation(0.0, degrees);  //reset Gyro to zero degrees
+		
 		
 		while(fabs(error)>=accuracy)
 		{
@@ -238,17 +239,21 @@ void autonomous(void) {
   // driveBrake(); 
   //inchDriveP(20); 
 
-  inchDriveP(-18);
-  gyroTurn(-40); 
-  inchDriveP(-10); 
-  clamp.set(true); 
-  wait(1000, msec); 
-  hook.spin(reverse, 70, pct); 
-  wait(1500, msec); 
-  gyroTurn(150); 
-  driveRobot(50, 50, 150); 
-  driveBrake(); 
-  hook.stop(); 
+  wait(1000, msec);
+  gyroTurn(90); 
+
+
+  // inchDriveP(-18);
+  // gyroTurn(-40); 
+  // inchDriveP(-10); 
+  // clamp.set(true); 
+  // wait(1000, msec); 
+  // hook.spin(reverse, 70, pct); 
+  // wait(1500, msec); 
+  // gyroTurn(150); 
+  // driveRobot(50, 50, 150); 
+  // driveBrake(); 
+  // hook.stop(); 
 
   
 
