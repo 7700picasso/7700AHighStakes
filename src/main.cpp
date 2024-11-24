@@ -175,7 +175,7 @@ void gyroTurn(float target)
 		float heading=0.0; //initialize a variable for heading
 		float accuracy=2.0; //how accurate to make the turn in degrees
 		float error=target-heading;
-		float kp=2.55;//3
+		float kp=.2;//3//2.55
 		float speed=kp*error;
 		Gyro.setRotation(0.0, degrees);  //reset Gyro to zero degrees
 		
@@ -185,6 +185,7 @@ void gyroTurn(float target)
 			driveRobot(-speed, speed, 10); //turn right at speed
 			heading=Gyro.rotation();  //measure the heading of the robot
 			error=target-heading;  //calculate error
+      Brain.Screen.printAt(100,100, "%f", heading);
 		}
 			driveBrake();  //stope the drive
 }
@@ -192,7 +193,7 @@ void gyroTurn(float target)
 void inchDriveP(float target){
   float x=0;
   float error=target;
-  float kp=5;
+  float kp=3;
   float speed =kp*error;
   float accuracy=2.8;
   float Dia = 3.25; //inches
@@ -239,7 +240,17 @@ void autonomous(void) {
   //inchDriveP(20); 
 
   wait(1000, msec);
-  gyroTurn(90); 
+  inchDriveP(-26.5);
+  gyroTurn(-38); 
+  inchDriveP(-12.5);
+  clamp.set(true);
+  wait(500,msec);
+  hook.spin(reverse,90, pct ); 
+  gyroTurn(128);
+  inchDriveP(19);
+  //130 degrees positive
+  //go forward to touch the ladder
+
 
 
   // inchDriveP(-18);
