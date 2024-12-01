@@ -29,6 +29,10 @@ controller Controller1;
 
 digital_out clamp = digital_out (Brain.ThreeWirePort.H ); 
 
+int AutonSelected = 2;
+int AutonMin = 0;
+int AutonMax = 4;
+
 // define your global instances of motors and other devices here
 
 /*---------------------------------------------------------------------------*/
@@ -210,13 +214,63 @@ speed=kp*error;
 driveBrake();
 }
 
+void drawGUI() {
+	// Draws 2 buttons to be used for selecting auto
+	Brain.Screen.clearScreen();
+	Brain.Screen.printAt(1, 40, "Select Auton then Press Go");
+	Brain.Screen.printAt(1, 200, "Auton Selected =  %d   ", AutonSelected);
+	Brain.Screen.setFillColor(red);
+	Brain.Screen.drawRectangle(20, 50, 100, 100);
+	Brain.Screen.drawCircle(300, 75, 25);
+	Brain.Screen.printAt(25, 75, "Select");
+	Brain.Screen.setFillColor(green);
+	Brain.Screen.drawRectangle(170, 50, 100, 100);
+	Brain.Screen.printAt(175, 75, "GO");
+	Brain.Screen.setFillColor(black);
+}
 
+void selectAuton() {
 
+		bool selectingAuton = true;
+		
+		int x = Brain.Screen.xPosition(); // get the x position of last touch of the screen
+		int y = Brain.Screen.yPosition(); // get the y position of last touch of the screen
+		
+
+		// check to see if buttons were pressed
+		if (x >= 20 && x <= 120 && y >= 50 && y <= 150){ // select button pressed
+				AutonSelected++;
+				if (AutonSelected > AutonMax){
+						AutonSelected = AutonMin; // rollover
+				}
+				Brain.Screen.printAt(1, 200, "Auton Selected =  %d   ", AutonSelected);
+		}
+		
+		
+		if (x >= 170 && x <= 270 && y >= 50 && y <= 150) {
+				selectingAuton = false; // GO button pressed
+				Brain.Screen.printAt(1, 200, "Auton  =  %d   GO           ", AutonSelected);
+		}
+		
+		if (!selectingAuton) {
+				Brain.Screen.setFillColor(green);
+				Brain.Screen.drawCircle(300, 75, 25);
+		} else {
+				Brain.Screen.setFillColor(red);
+				Brain.Screen.drawCircle(300, 75, 25);
+		}
+		
+		wait(10, msec); // slow it down
+		Brain.Screen.setFillColor(black);
+}
 
 /*---------------------------------------------------------------------------*/
 
 
 void pre_auton(void) {
+
+  drawGUI();
+		Brain.Screen.pressed(selectAuton);
 
  while (Gyro.isCalibrating()){ 
   wait(100, msec);
@@ -234,36 +288,62 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
+
+  switch (AutonSelected) {
+				case 0:
+					//code 0
+          wait(1000, msec);
+          inchDriveP(-26.5);
+          gyroTurn(-38); 
+          inchDriveP(-12.5);
+          clamp.set(true);
+          wait(500,msec);
+          hook.spin(reverse,90, pct ); 
+          gyroTurn(128);
+          inchDriveP(19);
+          //130 degrees positive
+          //go forward to touch the ladder
+					break;
+				
+				case 1:
+					//code 1
+            // inchDriveP(-18);
+            // gyroTurn(-40); 
+            // inchDriveP(-10); 
+            // clamp.set(true); 
+            // wait(1000, msec); 
+            // hook.spin(reverse, 70, pct); 
+            // wait(1500, msec); 
+            // gyroTurn(150); 
+            // driveRobot(50, 50, 150); 
+            // driveBrake(); 
+            // hook.stop(); 
+					break;
+				
+				case 2:
+					//code 2
+            wait(1000, msec);
+            inchDriveP(26.5);
+            gyroTurn(38);
+            inchDriveP(12.5);
+            clamp.set(true);
+            wait(500,msec);
+            hook.spin(reverse,90, pct );
+            gyroTurn(128);
+            inchDriveP(19);
+
+					break;
+				
+				case 3:
+					//code 3
+					break;
+		}
   // ..........................................................................
-  // driveRobot(20, 20, 2000); 
-  // driveBrake(); 
-  //inchDriveP(20); 
-
-  wait(1000, msec);
-  inchDriveP(-26.5);
-  gyroTurn(-38); 
-  inchDriveP(-12.5);
-  clamp.set(true);
-  wait(500,msec);
-  hook.spin(reverse,90, pct ); 
-  gyroTurn(128);
-  inchDriveP(19);
-  //130 degrees positive
-  //go forward to touch the ladder
+ 
 
 
 
-  // inchDriveP(-18);
-  // gyroTurn(-40); 
-  // inchDriveP(-10); 
-  // clamp.set(true); 
-  // wait(1000, msec); 
-  // hook.spin(reverse, 70, pct); 
-  // wait(1500, msec); 
-  // gyroTurn(150); 
-  // driveRobot(50, 50, 150); 
-  // driveBrake(); 
-  // hook.stop(); 
+
 
   
 
