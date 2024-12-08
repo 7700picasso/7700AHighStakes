@@ -29,7 +29,7 @@ controller Controller1;
 
 digital_out clamp = digital_out (Brain.ThreeWirePort.H ); 
 
-int AutonSelected = 2;
+int AutonSelected = 0;
 int AutonMin = 0;
 int AutonMax = 4;
 
@@ -270,7 +270,7 @@ void selectAuton() {
 void pre_auton(void) {
 
   drawGUI();
-		Brain.Screen.pressed(selectAuton);
+	Brain.Screen.pressed(selectAuton);
 
  while (Gyro.isCalibrating()){ 
   wait(100, msec);
@@ -299,59 +299,59 @@ void autonomous(void) {
 	// gyroTurn(128);
 	// inchDriveP(19);
 
-	// switch (AutonSelected) {
-	// 		case 0:
-	// 		// //code 0
-	// 			// wait(1000, msec);
-	// 			// inchDriveP(-26.5);
-	// 			// gyroTurn(-38); 
-	// 			// inchDriveP(-12.5);
-	// 			// clamp.set(true);
-	// 			// wait(500,msec);
-	// 			// hook.spin(reverse,90, pct ); 
-	// 			// gyroTurn(128);
-	// 			// inchDriveP(19);
-	// 			// //130 degrees positive
-	// 			// //go forward to touch the ladder
-	// 			break;
+	switch (AutonSelected) {
+			case 0:
+			// code 0
+				wait(1000, msec);
+				inchDriveP(-26.5);
+				gyroTurn(-38); 
+				inchDriveP(-12.5);
+				clamp.set(true);
+				wait(500,msec);
+				hook.spin(reverse,90, pct ); 
+				gyroTurn(128);
+				inchDriveP(19);
+				//130 degrees positive
+				//go forward to touch the ladder
+				break;
 			
-	// 		case 1:
-	// 			//code 1
-	// 			// inchDriveP(-18);
-	// 			// gyroTurn(-40); 
-	// 			// inchDriveP(-10); 
-	// 			// clamp.set(true); 
-	// 			// wait(1000, msec); 
-	// 			// hook.spin(reverse, 70, pct); 
-	// 			// wait(1500, msec); 
-	// 			// gyroTurn(150); 
-	// 			// driveRobot(50, 50, 150); 
-	// 			// driveBrake(); 
-	// 			// hook.stop(); 
-	// 			break;
+			case 1:
+				// code 1bn 
+				inchDriveP(-18);
+				gyroTurn(-40); 
+				inchDriveP(-10); 
+				clamp.set(true); 
+				wait(1000, msec); 
+				hook.spin(reverse, 70, pct); 
+				wait(1500, msec); 
+				gyroTurn(150); 
+				driveRobot(50, 50, 150); 
+				driveBrake(); 
+				hook.stop(); 
+				break;
 					
-	// 		case 2:
-	// 			//code 2
-	// 			gyroTurn(38);
+			case 2:
+				//code 2
+				gyroTurn(38);
 
-	// 			// wait(1000, msec);
-	// 			// inchDriveP(-26.5);
-	// 			// gyroTurn(38);
-	// 			// inchDriveP(12.5);
-	// 			// clamp.set(true);
-	// 			// wait(500,msec);
-	// 			// hook.spin(reverse,90, pct );
-	// 			// gyroTurn(128);
-	// 			// inchDriveP(19);
+				wait(1000, msec);
+				inchDriveP(-26.5);
+				gyroTurn(38);
+				inchDriveP(12.5);
+				clamp.set(true);
+				wait(500,msec);
+				hook.spin(reverse,90, pct );
+				gyroTurn(128);
+				inchDriveP(19);
 
-	// 			break;
+				break;
 					
-	// 		case 3:
-	// 			//code 3
-	// 			break;
+			case 3:
+				//code 3
+				break;
 			
-	// 		break;
-	// 		}
+			break;
+			}
 
 // ..........................................................................
   // ..........................................................................
