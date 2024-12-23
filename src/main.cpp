@@ -32,6 +32,7 @@ digital_out clamp = digital_out (Brain.ThreeWirePort.H );
 int AutonSelected = 0;
 int AutonMin = 0;
 int AutonMax = 4;
+bool Clamp_count;
 
 // define your global instances of motors and other devices here
 
@@ -272,11 +273,32 @@ void pre_auton(void) {
   drawGUI();
 	Brain.Screen.pressed(selectAuton);
 
+	while (true){
+	if (AutonSelected == 0){ 
+		Brain.Screen.printAt(10, 10, "BLUE Negative"); 
+	
+	}
+	else if (AutonSelected== 1 ){
+		Brain.Screen.printAt(10,10,"BlUE Positive");
+
+	
+	}
+	else if (AutonSelected== 2 ){
+		Brain.Screen.printAt(10,10,"RED Positive");
+
+
+	}
+	else if (AutonSelected== 3 ){
+		Brain.Screen.printAt(10,10,"RED Negative");
+
+
+	}
+
  while (Gyro.isCalibrating()){ 
   wait(100, msec);
  }
 }
-
+}
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -289,7 +311,6 @@ void pre_auton(void) {
 
 void autonomous(void) {
 	wait(1000, msec);
-	gyroTurn(90);
 	// inchDriveP(-26.5);
 	// gyroTurn(38);
 	// inchDriveP(12.5);
@@ -301,54 +322,59 @@ void autonomous(void) {
 
 	switch (AutonSelected) {
 			case 0:
-			// code 0
+			// code 0  blue - corner
 				wait(1000, msec);
 				inchDriveP(-26.5);
 				gyroTurn(-38); 
 				inchDriveP(-12.5);
-				clamp.set(true);
+				clamp.set(true);  //clamped on mobile goal
 				wait(500,msec);
-				hook.spin(reverse,90, pct ); 
+				hook.spin(reverse,90, pct ); //scored preload
 				gyroTurn(128);
 				inchDriveP(19);
-				//130 degrees positive
+				
 				//go forward to touch the ladder
 				break;
 			
 			case 1:
-				// code 1bn 
-				inchDriveP(-18);
-				gyroTurn(-40); 
-				inchDriveP(-10); 
-				clamp.set(true); 
-				wait(1000, msec); 
-				hook.spin(reverse, 70, pct); 
-				wait(1500, msec); 
-				gyroTurn(150); 
-				driveRobot(50, 50, 150); 
-				driveBrake(); 
-				hook.stop(); 
-				break;
-					
-			case 2:
-				//code 2
-				gyroTurn(38);
-
+				// code 1  blue + corner
 				wait(1000, msec);
 				inchDriveP(-26.5);
 				gyroTurn(38);
-				inchDriveP(12.5);
+				inchDriveP(-12.5);
 				clamp.set(true);
 				wait(500,msec);
 				hook.spin(reverse,90, pct );
+				gyroTurn(-128);
+				inchDriveP(19);
+					break; 
+			case 2:
+				//code 2 red + corner
+				wait(1000, msec);
+				inchDriveP(-26.5);
+				gyroTurn(-38); 
+				inchDriveP(-12.5);
+				clamp.set(true);  //clamped on mobile goal
+				wait(500,msec);
+				hook.spin(reverse,90, pct ); //scored preload
 				gyroTurn(128);
 				inchDriveP(19);
-
+				
+				//go forward to touch the ladder
 				break;
+		
 					
 			case 3:
-				//code 3
-				break;
+				//code 3 red- corner
+				wait(1000, msec);
+				inchDriveP(-26.5);
+				gyroTurn(38);
+				inchDriveP(-12.5);
+				clamp.set(true);
+				wait(500,msec);
+				hook.spin(reverse,90, pct );
+				gyroTurn(-128);
+				inchDriveP(19);
 			
 			break;
 			}
@@ -369,6 +395,7 @@ void autonomous(void) {
 
 void usercontrol(void) {
   // User control code here, inside the loop
+  bool Clamp_count=false;
   while (1) {
     
     Display(); 
@@ -379,13 +406,21 @@ void usercontrol(void) {
     driveRobot(rspeed, lspeed, 10);
 
 
-    if (Controller1.ButtonL1.pressing()){ 
-      clamp.set(true); 
-
-    }
-    if (Controller1.ButtonL2.pressing()){ 
-      clamp.set(false); 
-    }
+    if (Controller1.ButtonL1.pressing()){
+		if(!(Clamp_count)){
+			Clamp_count=true;
+		}else if(Clamp_count){
+			Clamp_count=false;
+		}while(Controller1.ButtonL1.pressing()){
+			wait(1,msec);
+		}
+	} 
+	if (Clamp_count){
+		clamp.set(true);
+	}else if(!(Clamp_count)){
+		clamp.set(false);
+	}
+      
 
     if (Controller1.ButtonR1.pressing()){ 
       intake.spin(fwd, 0, pct); 
