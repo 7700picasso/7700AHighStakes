@@ -293,6 +293,9 @@ void pre_auton(void) {
 
 
 	}
+	else if (AutonSelected==4){
+		Brain.Screen.printAt(10,10,"SKILLS AUTON");
+	}
 
  while (Gyro.isCalibrating()){ 
   wait(100, msec);
@@ -375,8 +378,41 @@ void autonomous(void) {
 				hook.spin(reverse,90, pct );
 				gyroTurn(-128);
 				inchDriveP(19);
-			
-			break;
+				break;
+			case 4:
+				//SKILLS AUTON
+				wait(1000, msec);
+				inchDriveP(-10.5);
+				clamp.set(true); //grabbed clamp
+				intake.spin(reverse, 100, pct); 
+				hook.spin(reverse,93, pct ); //start intake and score preload
+				gyroTurn(-45);
+				inchDriveP(14); //score one ring
+				gyroTurn(-160);
+				inchDriveP(-22); //turn around to put goal in corner
+				wait(3000,msec);
+				clamp.set(false);
+				inchDriveP(9);   // these are meant to
+				inchDriveP(-9);  // shake the mobile goal off
+				inchDriveP(25);
+				gyroTurn(150);
+				inchDriveP(-49);// drives to other goal
+				clamp.set(true); //grabbed clamp
+				gyroTurn(155);
+				inchDriveP(30);
+				gyroTurn(180);
+				inchDriveP(-18);
+				clamp.set(false);
+				inchDriveP(9);   // these are meant to
+				inchDriveP(-9);  // shake the mobile goal off
+				inchDriveP(12);
+
+
+
+	
+
+				break;
+
 			}
 
 // ..........................................................................
