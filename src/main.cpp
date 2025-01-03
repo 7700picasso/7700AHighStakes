@@ -16,7 +16,7 @@ competition Competition;
 
 brain Brain; 
 
-motor intake = motor(PORT10, ratio6_1, false);  
+motor intake = motor(PORT10, ratio6_1, true);  
 motor hook = motor(PORT3, ratio6_1, true);
 motor LF = motor(PORT5, ratio6_1, true);
 motor LB = motor(PORT2, ratio6_1, true);
@@ -28,11 +28,13 @@ inertial Gyro = inertial (PORT7);
 controller Controller1; 
 
 digital_out clamp = digital_out (Brain.ThreeWirePort.H ); 
+digital_out sweep= digital_out (Brain.ThreeWirePort.A);
 
 int AutonSelected = 0;
 int AutonMin = 0;
 int AutonMax = 4;
 bool Clamp_count;
+bool Sweep_count;
 
 // define your global instances of motors and other devices here
 
@@ -433,6 +435,7 @@ void autonomous(void) {
 void usercontrol(void) {
   // User control code here, inside the loop
   bool Clamp_count=false;
+  bool Sweep_count=true;
   while (1) {
     
     Display(); 
@@ -457,6 +460,32 @@ void usercontrol(void) {
 	}else if(!(Clamp_count)){
 		clamp.set(false);
 	}
+
+
+
+	if (Controller1.ButtonX.pressing())
+	{
+		sweep.set(true); 
+	}
+    else if (Controller1.ButtonY.pressing())
+	{
+		sweep.set(false); 
+	}
+	
+	/*if (Controller1.ButtonL2.pressing()){
+		if(!(Sweep_count)){
+			Sweep_count=true;
+		}else if(Sweep_count){
+			Sweep_count=false;
+		}while(Controller1.ButtonL2.pressing()){
+			wait(1,msec);
+		}
+	} 
+	if (Sweep_count){
+		sweep.set(true);
+	}else if(!(Sweep_count)){
+		sweep.set(false);
+	}*/
       
 
     if (Controller1.ButtonR1.pressing()){ 
@@ -464,19 +493,19 @@ void usercontrol(void) {
       hook.spin(fwd,40, pct ); 
     }
     
-      else if (Controller1.ButtonR2.pressing()){ 
-      intake.spin(reverse, 90, pct); 
-      hook.spin(reverse,90, pct ); }
+    else if (Controller1.ButtonR2.pressing()){ 
+    intake.spin(reverse, 70, pct); 
+	hook.spin(reverse,70, pct ); }
 
-      else {
-        intake.stop();
-        hook.stop();
-      }
+    else {
+    intake.stop();
+    hook.stop();
+    }
 
 
 
     wait(20, msec); // Sleep the task for a short amount of time to
-                    // prevent wasted resources.
+       // prevent wasted resources.
   }
 }
 
