@@ -435,11 +435,13 @@ void autonomous(void) {
 void usercontrol(void) {
   // User control code here, inside the loop
   bool Clamp_count=false;
-  bool Sweep_count=true;
+  bool Sweep_count=false;
+
+  Brain.Screen.clearScreen();
   while (1) {
     
     Display(); 
-
+	
     int rspeed = Controller1.Axis2.position(pct); 
     int lspeed = Controller1.Axis3.position(pct);
     
@@ -463,16 +465,9 @@ void usercontrol(void) {
 
 
 
-	if (Controller1.ButtonX.pressing())
-	{
-		sweep.set(true); 
-	}
-    else if (Controller1.ButtonY.pressing())
-	{
-		sweep.set(false); 
-	}
 	
-	/*if (Controller1.ButtonL2.pressing()){
+	
+	if (Controller1.ButtonL2.pressing()){
 		if(!(Sweep_count)){
 			Sweep_count=true;
 		}else if(Sweep_count){
@@ -481,15 +476,16 @@ void usercontrol(void) {
 			wait(1,msec);
 		}
 	} 
+
 	if (Sweep_count){
 		sweep.set(true);
 	}else if(!(Sweep_count)){
 		sweep.set(false);
-	}*/
+	}
       
 
     if (Controller1.ButtonR1.pressing()){ 
-      intake.spin(fwd, 0, pct); 
+      intake.spin(fwd, 70, pct); 
       hook.spin(fwd,40, pct ); 
     }
     
