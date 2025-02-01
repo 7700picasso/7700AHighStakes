@@ -16,7 +16,7 @@ competition Competition;
 
 brain Brain; 
 
-motor intake = motor(PORT10, ratio6_1, false);  
+motor intake = motor(PORT9, ratio6_1, true);  
 motor hook = motor(PORT3, ratio6_1, true);
 motor LF = motor(PORT5, ratio6_1, true);
 motor LB = motor(PORT2, ratio6_1, true);
@@ -28,6 +28,7 @@ inertial Gyro = inertial (PORT7);
 controller Controller1; 
 
 digital_out clamp = digital_out (Brain.ThreeWirePort.H ); 
+digital_out doink = digital_out (Brain.ThreeWirePort.A ); 
 
 int AutonSelected = 2;
 int AutonMin = 0;
@@ -55,7 +56,7 @@ void driveBrake() {
   RB.stop(brake); 
 }
 
-
+//comment
 
 double YOFFSET = 20; //offset for the display
 //Writes a line for the diagnostics of a motor on the Brain
@@ -264,6 +265,7 @@ void selectAuton() {
 		Brain.Screen.setFillColor(black);
 }
 
+
 /*---------------------------------------------------------------------------*/
 
 
@@ -289,7 +291,7 @@ void pre_auton(void) {
 
 void autonomous(void) {
 	wait(1000, msec);
-	gyroTurn(90);
+	//gyroTurn(90);
 	// inchDriveP(-26.5);
 	// gyroTurn(38);
 	// inchDriveP(12.5);
@@ -299,7 +301,7 @@ void autonomous(void) {
 	// gyroTurn(128);
 	// inchDriveP(19);
 
-	// switch (AutonSelected) {
+	 switch (AutonSelected) {
 	// 		case 0:
 	// 		// //code 0
 	// 			// wait(1000, msec);
@@ -313,9 +315,9 @@ void autonomous(void) {
 	// 			// inchDriveP(19);
 	// 			// //130 degrees positive
 	// 			// //go forward to touch the ladder
-	// 			break;
+	 			break;
 			
-	// 		case 1:
+			case 1:
 	// 			//code 1
 	// 			// inchDriveP(-18);
 	// 			// gyroTurn(-40); 
@@ -324,34 +326,34 @@ void autonomous(void) {
 	// 			// wait(1000, msec); 
 	// 			// hook.spin(reverse, 70, pct); 
 	// 			// wait(1500, msec); 
-	// 			// gyroTurn(150); 
-	// 			// driveRobot(50, 50, 150); 
-	// 			// driveBrake(); 
-	// 			// hook.stop(); 
-	// 			break;
+	// 			 gyroTurn(150); 
+	 			 driveRobot(50, 50, 150); 
+	 			 driveBrake(); 
+	 			 hook.stop(); 
+	 			break;
 					
-	// 		case 2:
+	 		case 2:
 	// 			//code 2
-	// 			gyroTurn(38);
+	//			gyroTurn(38);
 
-	// 			// wait(1000, msec);
-	// 			// inchDriveP(-26.5);
-	// 			// gyroTurn(38);
-	// 			// inchDriveP(12.5);
-	// 			// clamp.set(true);
-	// 			// wait(500,msec);
-	// 			// hook.spin(reverse,90, pct );
-	// 			// gyroTurn(128);
-	// 			// inchDriveP(19);
+	 			// wait(1000, msec);
+	 			 inchDriveP(-26.5);
+	 			 gyroTurn(-40);
+	 			 inchDriveP(-12.5);
+	 			 clamp.set(true);
+	 			 wait(500,msec);
+	 			 hook.spin(reverse,100, pct );
+	 			// gyroTurn(128);
+	 			// inchDriveP(19);
 
-	// 			break;
+	 			break;
 					
 	// 		case 3:
 	// 			//code 3
 	// 			break;
 			
 	// 		break;
-	// 		}
+	 		}
 
 // ..........................................................................
   // ..........................................................................
@@ -369,6 +371,8 @@ void autonomous(void) {
 
 void usercontrol(void) {
   // User control code here, inside the loop
+  bool Clamp_count = false;
+  bool doinkCount = false;
   while (1) {
     
     Display(); 
@@ -377,18 +381,47 @@ void usercontrol(void) {
     int lspeed = Controller1.Axis3.position(pct);
     
     driveRobot(rspeed, lspeed, 10);
+	
 
 
-    if (Controller1.ButtonL1.pressing()){ 
-      clamp.set(true); 
+    if (Controller1.ButtonL1.pressing()){
+		if(!(Clamp_count)){
+			Clamp_count=true;
+		}
+		else if(Clamp_count){
+			Clamp_count=false;
+		}
+		while (Controller1.ButtonL1.pressing()){
+			wait(1,msec);
+		}
+	}
+	if(Clamp_count){
+		clamp.set(true);}
+		else if(!(Clamp_count)){
+			clamp.set(false);
+		}
+	
 
-    }
-    if (Controller1.ButtonL2.pressing()){ 
-      clamp.set(false); 
-    }
+	if (Controller1.ButtonL2.pressing()){
+		if(!(doinkCount)){
+			doinkCount=true;
+		}
+		else if(doinkCount){
+			doinkCount=false;
+		}
+		while (Controller1.ButtonL2.pressing()){
+			wait(1,msec);
+		}
+	}
+	if(doinkCount){
+		doink.set(true);}
+		else if(!(doinkCount)){
+			doink.set(false);
+		}
+    
 
     if (Controller1.ButtonR1.pressing()){ 
-      intake.spin(fwd, 0, pct); 
+      intake.spin(fwd, 80, pct); 
       hook.spin(fwd,40, pct ); 
     }
     
