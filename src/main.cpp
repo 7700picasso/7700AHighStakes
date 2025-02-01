@@ -18,7 +18,7 @@ brain Brain;
 
 motor intake = motor(PORT9, ratio6_1, true);  
 motor hook = motor(PORT3, ratio6_1, true);
-motor LF = motor(PORT5, ratio6_1, true);
+motor LF = motor(PORT4, ratio6_1, true);
 motor LB = motor(PORT2, ratio6_1, true);
 motor RF = motor(PORT19, ratio6_1, false);
 motor RB = motor(PORT21, ratio6_1, false);
@@ -32,7 +32,7 @@ digital_out sweep= digital_out (Brain.ThreeWirePort.A);
 
 int AutonSelected = 0;
 int AutonMin = 0;
-int AutonMax = 4;
+int AutonMax = 5;
 bool Clamp_count;
 bool Sweep_count;
 
@@ -58,7 +58,7 @@ void driveBrake() {
   RB.stop(brake); 
 }
 
-//comment
+
 
 double YOFFSET = 20; //offset for the display
 //Writes a line for the diagnostics of a motor on the Brain
@@ -267,7 +267,6 @@ void selectAuton() {
 		Brain.Screen.setFillColor(black);
 }
 
-
 /*---------------------------------------------------------------------------*/
 
 
@@ -298,6 +297,9 @@ void pre_auton(void) {
 	}
 	else if (AutonSelected==4){
 		Brain.Screen.printAt(10,10,"SKILLS AUTON");
+	}
+	else if (AutonSelected==5){
+		Brain.Screen.printAt(10,10,"NOTHING");
 	}
 
  while (Gyro.isCalibrating()){ 
@@ -416,7 +418,14 @@ void autonomous(void) {
 
 				break;
 
+			case 5:
+				//NOTHING
+				wait(4000, msec);
+				break;
+
+
 			}
+			
 
 // ..........................................................................
   // ..........................................................................
@@ -447,7 +456,6 @@ void usercontrol(void) {
     int lspeed = Controller1.Axis3.position(pct);
     
     driveRobot(rspeed, lspeed, 10);
-	
 
 
     if (Controller1.ButtonL1.pressing()){
