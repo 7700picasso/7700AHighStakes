@@ -16,7 +16,7 @@ competition Competition;
 
 brain Brain; 
 
-motor intake = motor(PORT10, ratio6_1, true);  
+motor intake = motor(PORT9, ratio6_1, true);  
 motor hook = motor(PORT3, ratio6_1, true);
 motor LF = motor(PORT5, ratio6_1, true);
 motor LB = motor(PORT2, ratio6_1, true);
@@ -58,7 +58,7 @@ void driveBrake() {
   RB.stop(brake); 
 }
 
-
+//comment
 
 double YOFFSET = 20; //offset for the display
 //Writes a line for the diagnostics of a motor on the Brain
@@ -267,6 +267,7 @@ void selectAuton() {
 		Brain.Screen.setFillColor(black);
 }
 
+
 /*---------------------------------------------------------------------------*/
 
 
@@ -446,6 +447,7 @@ void usercontrol(void) {
     int lspeed = Controller1.Axis3.position(pct);
     
     driveRobot(rspeed, lspeed, 10);
+	
 
 
     if (Controller1.ButtonL1.pressing()){
