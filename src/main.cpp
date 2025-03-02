@@ -3,7 +3,7 @@
 /*    Module:       main.cpp                                                  */
 /*    Author:       student                                                   */
 /*    Created:      11/2/2024, 12:45:57 PM                                    */
-/*    Description:  V5 project                                                */
+/*    Description:  V5 project  -states code                                              */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
