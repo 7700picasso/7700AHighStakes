@@ -22,6 +22,7 @@ motor LF = motor(PORT4, ratio6_1, true);
 motor LB = motor(PORT2, ratio6_1, true);
 motor RF = motor(PORT19, ratio6_1, false);
 motor RB = motor(PORT21, ratio6_1, false);
+motor arm = motor(PORT7, ratio6_1, false);
 inertial Gyro = inertial (PORT7);
 
 
@@ -35,6 +36,7 @@ int AutonMin = 0;
 int AutonMax = 5;
 bool Clamp_count;
 bool Sweep_count;
+float LBtarget = 0;
 
 // define your global instances of motors and other devices here
 
@@ -57,8 +59,6 @@ void driveBrake() {
   RF.stop(brake); 
   RB.stop(brake); 
 }
-
-
 
 double YOFFSET = 20; //offset for the display
 //Writes a line for the diagnostics of a motor on the Brain
@@ -214,6 +214,30 @@ error=target-x;
 speed=kp*error;
 }
 
+void LBcontroller(){
+	float error;
+	float speed;
+	float pos;
+	float kp = 2.0;
+	while(true){
+		pos = arm.position(rev);
+		error = LBtarget-pos;
+		speed = kp*error*2; //Too slow, mutiple by 2?
+		if(pos==3.6){
+			arm.stop(hold);
+			wait(0.1, sec);
+			inchDriveP(-1);
+			arm.spin(fwd, 50, pct);
+			//Figure out how to make robot back up while moving arm
+		}
+		if(error<1){
+			arm.stop(hold);
+		}
+		else{
+			arm.spin(fwd, speed, pct);
+		}
+	}
+}
 driveBrake();
 }
 
@@ -318,7 +342,7 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-	wait(1000, msec);
+	wait(500, msec);
 	// inchDriveP(-26.5);
 	// gyroTurn(38);
 	// inchDriveP(12.5);
@@ -445,12 +469,16 @@ void autonomous(void) {
 void usercontrol(void) {
   // User control code here, inside the loop
   bool Clamp_count=false;
-  bool Sweep_count=false;
+  bool Sweep_count=true;
 
   Brain.Screen.clearScreen();
+  //thread name = thread(LBcontroller);
   while (1) {
+
+
+	Brain.Screen.printAt(1,30, "Arm Angle: %f  ", arm.position(rev));
     
-    Display(); 
+    // Display(); 
 	
     int rspeed = Controller1.Axis2.position(pct); 
     int lspeed = Controller1.Axis3.position(pct);
@@ -507,6 +535,11 @@ void usercontrol(void) {
     intake.stop();
     hook.stop();
     }
+
+	if(Controller1.ButtonA.pressing()){
+		LBtarget = 6;
+		LBcontroller();
+	}
 
 
 
