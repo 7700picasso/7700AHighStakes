@@ -238,8 +238,6 @@ void LBcontroller(){
 		}
 	}
 }
-driveBrake();
-}
 
 void drawGUI() {
 	// Draws 2 buttons to be used for selecting auto
