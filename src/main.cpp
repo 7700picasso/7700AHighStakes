@@ -37,6 +37,9 @@ int AutonMax = 5;
 bool Clamp_count;
 bool Sweep_count;
 float LBtarget = 0;
+float armPosition[] = {0.0, 3.6, 5.5};
+int currentPositionIndex = 0;
+
 
 // define your global instances of motors and other devices here
 
@@ -49,7 +52,7 @@ void driveRobot(float rspeed, float lspeed, int wt) {
     LB.spin(forward, lspeed, pct );
     RF.spin(forward, rspeed, pct);
     RB.spin(forward, rspeed, pct);
-    wait(wt, msec); 
+	wait(wt, msec); 
 
 }
 
@@ -207,35 +210,48 @@ void inchDriveP(float target){
   float Gr = 0.6; //(36Teeth / 60Teeth)
 LF.setPosition(0.0, rev);
 
+
 while(fabs(error)>accuracy){
 driveRobot(speed,speed,10);
 x=LF.position(rev)*M_PI*Dia*Gr; //pie = 3.14   Diameter=3.25   Gr=GearRatio=0.6
 error=target-x;
 speed=kp*error;
 }
-
+}
+void changeTarget(){
+	currentPositionIndex++;
+	if(currentPositionIndex > 3){
+		currentPositionIndex = 0;
+	}
+	LBtarget = armPosition[currentPositionIndex];
+}
 void LBcontroller(){
 	float error;
 	float speed;
 	float pos;
 	float kp = 2.0;
 	while(true){
+		LBtarget= armPosition[currentPositionIndex];
 		pos = arm.position(rev);
 		error = LBtarget-pos;
-		speed = kp*error*2; //Too slow, mutiple by 2?
-		if(pos==3.6){
+		speed = kp*error*3; //Too slow, mutiple by 2?
+		/*if(error<0.3){
 			arm.stop(hold);
-			wait(0.1, sec);
-			inchDriveP(-1);
-			arm.spin(fwd, 50, pct);
-			//Figure out how to make robot back up while moving arm
-		}
-		if(error<1){
+			arm.spin(reverse, 50, pct);
+		}	
+		else{
+			arm.spin(fwd, speed, pct);
+		} */
+		if(fabs(error)< 0.3){
+			arm.stop(brake);
+			wait(50, msec);
 			arm.stop(hold);
 		}
 		else{
 			arm.spin(fwd, speed, pct);
 		}
+		if(pos)
+		
 	}
 }
 
@@ -470,7 +486,8 @@ void usercontrol(void) {
   bool Sweep_count=true;
 
   Brain.Screen.clearScreen();
-  //thread name = thread(LBcontroller);
+  thread Thread(LBcontroller);
+  Controller1.ButtonB.pressed(changeTarget);
   while (1) {
 
 
