@@ -37,7 +37,7 @@ int AutonMax = 5;
 bool Clamp_count;
 bool Sweep_count;
 float LBtarget = 0;
-float armPosition[] = {0.0, 3.6, 5.5};
+float armPosition[] = {0.0, 90, 700};
 int currentPositionIndex = 0;
 
 
@@ -232,9 +232,9 @@ void LBcontroller(){
 	float kp = 2.0;
 	while(true){
 		LBtarget= armPosition[currentPositionIndex];
-		pos = arm.position(rev);
+		pos = arm.position(deg);
 		error = LBtarget-pos;
-		speed = kp*error*3; //Too slow, mutiple by 2?
+		speed = kp*error; //Too slow, mutiple by 2?
 		/*if(error<0.3){
 			arm.stop(hold);
 			arm.spin(reverse, 50, pct);
@@ -242,7 +242,7 @@ void LBcontroller(){
 		else{
 			arm.spin(fwd, speed, pct);
 		} */
-		if(fabs(error)< 0.3){
+		if(fabs(error)>3){
 			arm.stop(brake);
 			wait(50, msec);
 			arm.stop(hold);
@@ -250,7 +250,6 @@ void LBcontroller(){
 		else{
 			arm.spin(fwd, speed, pct);
 		}
-		if(pos)
 		
 	}
 }
@@ -481,9 +480,11 @@ void autonomous(void) {
 
 //comment 
 void usercontrol(void) {
+	Brain.Screen.clearScreen();
+	wait(2000,msec);
   // User control code here, inside the loop
   bool Clamp_count=false;
-  bool Sweep_count=true;
+  bool Sweep_count=false;
 
   Brain.Screen.clearScreen();
   thread Thread(LBcontroller);
@@ -491,9 +492,9 @@ void usercontrol(void) {
   while (1) {
 
 
-	Brain.Screen.printAt(1,30, "Arm Angle: %f  ", arm.position(rev));
+	Brain.Screen.printAt(1,30, "Arm Angle: %f  ", arm.position(degrees));
     
-    // Display(); 
+     //Display(); 
 	
     int rspeed = Controller1.Axis2.position(pct); 
     int lspeed = Controller1.Axis3.position(pct);
@@ -551,10 +552,10 @@ void usercontrol(void) {
     hook.stop();
     }
 
-	if(Controller1.ButtonA.pressing()){
-		LBtarget = 6;
-		LBcontroller();
-	}
+	// if(Controller1.ButtonA.pressing()){
+	// 	LBtarget = 6;
+	// 	LBcontroller();
+	// }
 
 
 
