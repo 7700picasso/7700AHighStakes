@@ -3,7 +3,7 @@
 /*    Module:       main.cpp                                                  */
 /*    Author:       student                                                   */
 /*    Created:      11/2/2024, 12:45:57 PM                                    */
-/*    Description:  V5 project                                                */
+/*    Description:  V5 project  -states code                                              */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
@@ -16,22 +16,30 @@ competition Competition;
 
 brain Brain; 
 
-motor intake = motor(PORT10, ratio6_1, false);  
+motor intake = motor(PORT9, ratio6_1, true);  
 motor hook = motor(PORT3, ratio6_1, true);
-motor LF = motor(PORT5, ratio6_1, true);
+motor LF = motor(PORT4, ratio6_1, true);
 motor LB = motor(PORT2, ratio6_1, true);
 motor RF = motor(PORT19, ratio6_1, false);
 motor RB = motor(PORT21, ratio6_1, false);
+motor arm = motor(PORT7, ratio6_1, false);
 inertial Gyro = inertial (PORT7);
 
 
 controller Controller1; 
 
 digital_out clamp = digital_out (Brain.ThreeWirePort.H ); 
+digital_out sweep= digital_out (Brain.ThreeWirePort.A);
 
-int AutonSelected = 2;
+int AutonSelected = 0;
 int AutonMin = 0;
-int AutonMax = 4;
+int AutonMax = 5;
+bool Clamp_count;
+bool Sweep_count;
+float LBtarget = 0;
+float armPosition[] = {0.0, 90, 700};
+int currentPositionIndex = 0;
+
 
 // define your global instances of motors and other devices here
 
@@ -44,7 +52,7 @@ void driveRobot(float rspeed, float lspeed, int wt) {
     LB.spin(forward, lspeed, pct );
     RF.spin(forward, rspeed, pct);
     RB.spin(forward, rspeed, pct);
-    wait(wt, msec); 
+	wait(wt, msec); 
 
 }
 
@@ -54,8 +62,6 @@ void driveBrake() {
   RF.stop(brake); 
   RB.stop(brake); 
 }
-
-
 
 double YOFFSET = 20; //offset for the display
 //Writes a line for the diagnostics of a motor on the Brain
@@ -204,14 +210,48 @@ void inchDriveP(float target){
   float Gr = 0.6; //(36Teeth / 60Teeth)
 LF.setPosition(0.0, rev);
 
+
 while(fabs(error)>accuracy){
 driveRobot(speed,speed,10);
 x=LF.position(rev)*M_PI*Dia*Gr; //pie = 3.14   Diameter=3.25   Gr=GearRatio=0.6
 error=target-x;
 speed=kp*error;
 }
-
-driveBrake();
+}
+void changeTarget(){
+	currentPositionIndex++;
+	if(currentPositionIndex > 3){
+		currentPositionIndex = 0;
+	}
+	LBtarget = armPosition[currentPositionIndex];
+}
+void LBcontroller(){
+	float error;
+	float speed;
+	float pos;
+	float kp = 2.0;
+	while(true){
+		LBtarget= armPosition[currentPositionIndex];
+		pos = arm.position(deg);
+		error = LBtarget-pos;
+		speed = kp*error; //Too slow, mutiple by 2?
+		/*if(error<0.3){
+			arm.stop(hold);
+			arm.spin(reverse, 50, pct);
+		}	
+		else{
+			arm.spin(fwd, speed, pct);
+		} */
+		if(fabs(error)>3){
+			arm.stop(brake);
+			wait(50, msec);
+			arm.stop(hold);
+		}
+		else{
+			arm.spin(fwd, speed, pct);
+		}
+		
+	}
 }
 
 void drawGUI() {
@@ -270,13 +310,40 @@ void selectAuton() {
 void pre_auton(void) {
 
   drawGUI();
-		Brain.Screen.pressed(selectAuton);
+	Brain.Screen.pressed(selectAuton);
+
+	while (true){
+	if (AutonSelected == 0){ 
+		Brain.Screen.printAt(10, 10, "BLUE Negative"); 
+	
+	}
+	else if (AutonSelected== 1 ){
+		Brain.Screen.printAt(10,10,"BlUE Positive");
+
+	
+	}
+	else if (AutonSelected== 2 ){
+		Brain.Screen.printAt(10,10,"RED Positive");
+
+
+	}
+	else if (AutonSelected== 3 ){
+		Brain.Screen.printAt(10,10,"RED Negative");
+
+
+	}
+	else if (AutonSelected==4){
+		Brain.Screen.printAt(10,10,"SKILLS AUTON");
+	}
+	else if (AutonSelected==5){
+		Brain.Screen.printAt(10,10,"NOTHING");
+	}
 
  while (Gyro.isCalibrating()){ 
   wait(100, msec);
  }
 }
-
+}
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -288,8 +355,7 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-	wait(1000, msec);
-	gyroTurn(90);
+	wait(500, msec);
 	// inchDriveP(-26.5);
 	// gyroTurn(38);
 	// inchDriveP(12.5);
@@ -299,59 +365,104 @@ void autonomous(void) {
 	// gyroTurn(128);
 	// inchDriveP(19);
 
-	// switch (AutonSelected) {
-	// 		case 0:
-	// 		// //code 0
-	// 			// wait(1000, msec);
-	// 			// inchDriveP(-26.5);
-	// 			// gyroTurn(-38); 
-	// 			// inchDriveP(-12.5);
-	// 			// clamp.set(true);
-	// 			// wait(500,msec);
-	// 			// hook.spin(reverse,90, pct ); 
-	// 			// gyroTurn(128);
-	// 			// inchDriveP(19);
-	// 			// //130 degrees positive
-	// 			// //go forward to touch the ladder
-	// 			break;
+	switch (AutonSelected) {
+			case 0:
+			// code 0  blue - corner
+				wait(1000, msec);
+				inchDriveP(-26.5);
+				gyroTurn(-38); 
+				inchDriveP(-12.5);
+				clamp.set(true);  //clamped on mobile goal
+				wait(500,msec);
+				hook.spin(reverse,90, pct ); //scored preload
+				gyroTurn(128);
+				inchDriveP(19);
+				
+				//go forward to touch the ladder
+				break;
 			
-	// 		case 1:
-	// 			//code 1
-	// 			// inchDriveP(-18);
-	// 			// gyroTurn(-40); 
-	// 			// inchDriveP(-10); 
-	// 			// clamp.set(true); 
-	// 			// wait(1000, msec); 
-	// 			// hook.spin(reverse, 70, pct); 
-	// 			// wait(1500, msec); 
-	// 			// gyroTurn(150); 
-	// 			// driveRobot(50, 50, 150); 
-	// 			// driveBrake(); 
-	// 			// hook.stop(); 
-	// 			break;
+			case 1:
+				// code 1  blue + corner
+				wait(1000, msec);
+				inchDriveP(-26.5);
+				gyroTurn(38);
+				inchDriveP(-12.5);
+				clamp.set(true);
+				wait(500,msec);
+				hook.spin(reverse,90, pct );
+				gyroTurn(-128);
+				inchDriveP(19);
+					break; 
+			case 2:
+				//code 2 red + corner
+				wait(1000, msec);
+				inchDriveP(-26.5);
+				gyroTurn(-38); 
+				inchDriveP(-12.5);
+				clamp.set(true);  //clamped on mobile goal
+				wait(500,msec);
+				hook.spin(reverse,90, pct ); //scored preload
+				gyroTurn(128);
+				inchDriveP(19);
+				
+				//go forward to touch the ladder
+				break;
+		
 					
-	// 		case 2:
-	// 			//code 2
-	// 			gyroTurn(38);
+			case 3:
+				//code 3 red- corner
+				wait(1000, msec);
+				inchDriveP(-26.5);
+				gyroTurn(38);
+				inchDriveP(-12.5);
+				clamp.set(true);
+				wait(500,msec);
+				hook.spin(reverse,90, pct );
+				gyroTurn(-128);
+				inchDriveP(19);
+				break;
+			case 4:
+				//SKILLS AUTON
+				wait(1000, msec);
+				inchDriveP(-10.5);
+				clamp.set(true); //grabbed clamp
+				intake.spin(reverse, 100, pct); 
+				hook.spin(reverse,93, pct ); //start intake and score preload
+				gyroTurn(-45);
+				inchDriveP(14); //score one ring
+				gyroTurn(-160);
+				inchDriveP(-22); //turn around to put goal in corner
+				wait(3000,msec);
+				clamp.set(false);
+				inchDriveP(9);   // these are meant to
+				inchDriveP(-9);  // shake the mobile goal off
+				inchDriveP(25);
+				gyroTurn(150);
+				inchDriveP(-49);// drives to other goal
+				clamp.set(true); //grabbed clamp
+				gyroTurn(155);
+				inchDriveP(30);
+				gyroTurn(180);
+				inchDriveP(-18);
+				clamp.set(false);
+				inchDriveP(9);   // these are meant to
+				inchDriveP(-9);  // shake the mobile goal off
+				inchDriveP(12);
 
-	// 			// wait(1000, msec);
-	// 			// inchDriveP(-26.5);
-	// 			// gyroTurn(38);
-	// 			// inchDriveP(12.5);
-	// 			// clamp.set(true);
-	// 			// wait(500,msec);
-	// 			// hook.spin(reverse,90, pct );
-	// 			// gyroTurn(128);
-	// 			// inchDriveP(19);
 
-	// 			break;
-					
-	// 		case 3:
-	// 			//code 3
-	// 			break;
+
+	
+
+				break;
+
+			case 5:
+				//NOTHING
+				wait(4000, msec);
+				break;
+
+
+			}
 			
-	// 		break;
-	// 		}
 
 // ..........................................................................
   // ..........................................................................
@@ -367,44 +478,89 @@ void autonomous(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
+//comment 
 void usercontrol(void) {
+	Brain.Screen.clearScreen();
+	wait(2000,msec);
   // User control code here, inside the loop
-  while (1) {
-    
-    Display(); 
+  bool Clamp_count=false;
+  bool Sweep_count=false;
 
+  Brain.Screen.clearScreen();
+  thread Thread(LBcontroller);
+  Controller1.ButtonB.pressed(changeTarget);
+  while (1) {
+
+
+	Brain.Screen.printAt(1,30, "Arm Angle: %f  ", arm.position(degrees));
+    
+     //Display(); 
+	
     int rspeed = Controller1.Axis2.position(pct); 
     int lspeed = Controller1.Axis3.position(pct);
     
     driveRobot(rspeed, lspeed, 10);
 
 
-    if (Controller1.ButtonL1.pressing()){ 
-      clamp.set(true); 
+    if (Controller1.ButtonL1.pressing()){
+		if(!(Clamp_count)){
+			Clamp_count=true;
+		}else if(Clamp_count){
+			Clamp_count=false;
+		}while(Controller1.ButtonL1.pressing()){
+			wait(1,msec);
+		}
+	} 
+	if (Clamp_count){
+		clamp.set(true);
+	}else if(!(Clamp_count)){
+		clamp.set(false);
+	}
 
-    }
-    if (Controller1.ButtonL2.pressing()){ 
-      clamp.set(false); 
-    }
+
+
+	
+	
+	if (Controller1.ButtonL2.pressing()){
+		if(!(Sweep_count)){
+			Sweep_count=true;
+		}else if(Sweep_count){
+			Sweep_count=false;
+		}while(Controller1.ButtonL2.pressing()){
+			wait(1,msec);
+		}
+	} 
+
+	if (Sweep_count){
+		sweep.set(true);
+	}else if(!(Sweep_count)){
+		sweep.set(false);
+	}
+      
 
     if (Controller1.ButtonR1.pressing()){ 
-      intake.spin(fwd, 0, pct); 
+      intake.spin(fwd, 70, pct); 
       hook.spin(fwd,40, pct ); 
     }
     
-      else if (Controller1.ButtonR2.pressing()){ 
-      intake.spin(reverse, 90, pct); 
-      hook.spin(reverse,90, pct ); }
+    else if (Controller1.ButtonR2.pressing()){ 
+    intake.spin(reverse, 70, pct); 
+	hook.spin(reverse,70, pct ); }
 
-      else {
-        intake.stop();
-        hook.stop();
-      }
+    else {
+    intake.stop();
+    hook.stop();
+    }
+
+	// if(Controller1.ButtonA.pressing()){
+	// 	LBtarget = 6;
+	// 	LBcontroller();
+	// }
 
 
 
     wait(20, msec); // Sleep the task for a short amount of time to
-                    // prevent wasted resources.
+       // prevent wasted resources.
   }
 }
 
