@@ -382,10 +382,10 @@ void autonomous(void) {
 	gyroTurn(180);
 	intake.spin(reverse, 80, pct);
 	hook.spin(reverse, 80, pct);
-	driveRobot(60,60,500); //intake rings 4 and 5
+	driveRobot(60,60, 1300); //intake rings 4 and 5
 	driveBrake();
 	inchDriveP(-10);
-	gyroTurn(315); //face corner
+	gyroTurn(-45); //face corner
 	clamp.set(false);
 	inchDriveP(-16); //push stake in corner
 	hook.spin(forward, 80, pct);
