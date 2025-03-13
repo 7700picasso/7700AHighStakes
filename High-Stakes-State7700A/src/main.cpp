@@ -377,7 +377,7 @@ void autonomous(void) {
 	hook.stop();
 	inchDriveP(20);
 	gyroTurn(138); //140 was a little too much
-	inchDriveP(-60); //drive up to 2nd stake
+	inchDriveP(-60); //drive up to 2nd stake (try to figure out how to slow down right at stake?)
 	clamp.set(true);
 	gyroTurn(180);
 	intake.spin(reverse, 80, pct);
@@ -385,7 +385,7 @@ void autonomous(void) {
 	driveRobot(60,60, 1300); //intake rings 4 and 5
 	driveBrake();
 	inchDriveP(-10);
-	gyroTurn(-45); //face corner
+	gyroTurn(315); //face corner (test this part wasn't working last time)
 	clamp.set(false);
 	inchDriveP(-16); //push stake in corner
 	hook.spin(forward, 80, pct);
