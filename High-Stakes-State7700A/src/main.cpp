@@ -22,8 +22,8 @@ motor LF = motor(PORT4, ratio6_1, true);
 motor LB = motor(PORT2, ratio6_1, true);
 motor RF = motor(PORT19, ratio6_1, false);
 motor RB = motor(PORT21, ratio6_1, false);
-motor arm = motor(PORT7, ratio6_1, false);
-inertial Gyro = inertial (PORT7);
+motor arm = motor(PORT7, ratio18_1, false);
+inertial Gyro = inertial (PORT10);
 
 
 controller Controller1; 
@@ -37,7 +37,7 @@ int AutonMax = 5;
 bool Clamp_count;
 bool Sweep_count;
 float LBtarget = 0;
-float armPosition[] = {0.0, 90, 700};
+float armPosition[] = {0.0, 70, 700};
 int currentPositionIndex = 0;
 
 
@@ -185,7 +185,7 @@ void gyroTurn(float target)
 		float heading=0.0; //initialize a variable for heading
 		float accuracy=2.0; //how accurate to make the turn in degrees
 		float error=target-heading;
-		float kp=.2;//3//2.55
+		float kp=.4;//3//2.55
 		float speed=kp*error;
 		Gyro.setRotation(0.0, degrees);  //reset Gyro to zero degrees
 		
@@ -229,7 +229,7 @@ void LBcontroller(){
 	float error;
 	float speed;
 	float pos;
-	float kp = 2.0;
+	float kp = 0.75;
 	while(true){
 		LBtarget= armPosition[currentPositionIndex];
 		pos = arm.position(deg);
@@ -242,7 +242,7 @@ void LBcontroller(){
 		else{
 			arm.spin(fwd, speed, pct);
 		} */
-		if(fabs(error)>3){
+		if(fabs(error)<3){
 			arm.stop(brake);
 			wait(50, msec);
 			arm.stop(hold);
@@ -355,8 +355,44 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-	wait(500, msec);
-	// inchDriveP(-26.5);
+	wait(1000, msec);
+	inchDriveP(-10.5);
+	clamp.set(true); //clamp on stake
+	intake.spin(reverse, 80, pct); 
+	hook.spin(reverse, 80, pct); //score preload
+	gyroTurn(-40);
+	driveRobot(80,80,500); //intake first ring
+	driveBrake();
+	inchDriveP(-20);
+	gyroTurn(-25);
+	driveRobot(60,60,1000); //intaking rings 2 and 3 -was 80 too fast
+	driveBrake();
+	inchDriveP(-10);
+	gyroTurn(-135);
+	clamp.set(false); //unclamp before driving into corner
+	inchDriveP(-16);
+	intake.stop();
+	hook.spin(forward,80, pct); //make sure stake doesn't get dragged
+	wait(300, msec);
+	hook.stop();
+	inchDriveP(20);
+	gyroTurn(138); //140 was a little too much
+	inchDriveP(-60); //drive up to 2nd stake
+	clamp.set(true);
+	gyroTurn(180);
+	intake.spin(reverse, 80, pct);
+	hook.spin(reverse, 80, pct);
+	driveRobot(60,60,500); //intake rings 4 and 5
+	driveBrake();
+	inchDriveP(-10);
+	gyroTurn(315); //face corner
+	clamp.set(false);
+	inchDriveP(-16); //push stake in corner
+	hook.spin(forward, 80, pct);
+	wait(300, msec);
+
+
+	/*// inchDriveP(-26.5);
 	// gyroTurn(38);
 	// inchDriveP(12.5);
 	// clamp.set(true);
@@ -461,7 +497,7 @@ void autonomous(void) {
 				break;
 
 
-			}
+			}*/
 			
 
 // ..........................................................................
@@ -491,9 +527,9 @@ void usercontrol(void) {
   while (1) {
 
 
-	Brain.Screen.printAt(1,30, "Arm Angle: %f  ", arm.position(degrees));
+	//Brain.Screen.printAt(1,30, "Arm Angle: %f  ", arm.position(degrees));
     
-     //Display(); 
+     Display(); 
 	
     int rspeed = Controller1.Axis2.position(pct); 
     int lspeed = Controller1.Axis3.position(pct);
@@ -550,6 +586,7 @@ void usercontrol(void) {
     intake.stop();
     hook.stop();
     }
+
 
 	// if(Controller1.ButtonA.pressing()){
 	// 	LBtarget = 6;
