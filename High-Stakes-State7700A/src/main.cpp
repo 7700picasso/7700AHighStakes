@@ -37,7 +37,7 @@ int AutonMax = 5;
 bool Clamp_count;
 bool Sweep_count;
 float LBtarget = 0;
-float armPosition[] = {0.0, 70, 700};
+float armPosition[] = {0.0, 70, 605};
 int currentPositionIndex = 0;
 
 
@@ -355,58 +355,12 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-	wait(1000, msec);
-	inchDriveP(-10.5);
-	clamp.set(true); //clamp on stake
-	intake.spin(reverse, 80, pct); 
-	hook.spin(reverse, 80, pct); //score preload
-	gyroTurn(-40);
-	driveRobot(80,80,500); //intake first ring
-	driveBrake();
-	inchDriveP(-20);
-	gyroTurn(-25);
-	driveRobot(60,60,1000); //intaking rings 2 and 3 -was 80 too fast
-	driveBrake();
-	inchDriveP(-10);
-	gyroTurn(-135);
-	clamp.set(false); //unclamp before driving into corner
-	inchDriveP(-16);
-	intake.stop();
-	hook.spin(forward,80, pct); //make sure stake doesn't get dragged
-	wait(300, msec);
-	hook.stop();
-	inchDriveP(20);
-	gyroTurn(138); //140 was a little too much
-	inchDriveP(-60); //drive up to 2nd stake (try to figure out how to slow down right at stake?)
-	clamp.set(true);
-	gyroTurn(180);
-	intake.spin(reverse, 80, pct);
-	hook.spin(reverse, 80, pct);
-	driveRobot(60,60, 1300); //intake rings 4 and 5
-	driveBrake();
-	inchDriveP(-10);
-	gyroTurn(315); //face corner (test this part wasn't working last time)
-	clamp.set(false);
-	inchDriveP(-16); //push stake in corner
-	hook.spin(forward, 80, pct);
-	wait(300, msec);
-
-
-	/*// inchDriveP(-26.5);
-	// gyroTurn(38);
-	// inchDriveP(12.5);
-	// clamp.set(true);
-	// wait(500,msec);
-	// hook.spin(reverse,90, pct );
-	// gyroTurn(128);
-	// inchDriveP(19);
-
 	switch (AutonSelected) {
 			case 0:
 			// code 0  blue - corner
 				wait(1000, msec);
 				inchDriveP(-26.5);
-				gyroTurn(-38); 
+				gyroTurn(-37.5); 
 				inchDriveP(-12.5);
 				clamp.set(true);  //clamped on mobile goal
 				wait(500,msec);
@@ -421,7 +375,7 @@ void autonomous(void) {
 				// code 1  blue + corner
 				wait(1000, msec);
 				inchDriveP(-26.5);
-				gyroTurn(38);
+				gyroTurn(37.5);
 				inchDriveP(-12.5);
 				clamp.set(true);
 				wait(500,msec);
@@ -433,7 +387,7 @@ void autonomous(void) {
 				//code 2 red + corner
 				wait(1000, msec);
 				inchDriveP(-26.5);
-				gyroTurn(-38); 
+				gyroTurn(-37.5); 
 				inchDriveP(-12.5);
 				clamp.set(true);  //clamped on mobile goal
 				wait(500,msec);
@@ -449,7 +403,7 @@ void autonomous(void) {
 				//code 3 red- corner
 				wait(1000, msec);
 				inchDriveP(-26.5);
-				gyroTurn(38);
+				gyroTurn(37.5);
 				inchDriveP(-12.5);
 				clamp.set(true);
 				wait(500,msec);
@@ -458,8 +412,47 @@ void autonomous(void) {
 				inchDriveP(19);
 				break;
 			case 4:
-				//SKILLS AUTON
 				wait(1000, msec);
+				inchDriveP(-10.5);
+				clamp.set(true); //clamp on stake
+				intake.spin(reverse, 80, pct); 
+				hook.spin(reverse, 80, pct); //score preload
+				gyroTurn(-40);
+				driveRobot(80,80,500);
+				driveBrake();
+				inchDriveP(-20);
+				gyroTurn(-25);
+				intake.spin(reverse, 70, pct);
+				driveRobot(60,60,500); //intaking rings 2 and 3 -was 80 too fast //1000 for bothe
+				driveBrake();
+				wait(400,msec);
+				driveRobot(60,60,500);
+				driveBrake();
+				inchDriveP(-10);
+				gyroTurn(-135);
+				clamp.set(false); //unclamp before driving into corner
+				inchDriveP(-16);
+				intake.stop();
+				hook.spin(forward,80, pct); //make sure stake doesn't get dragged
+				wait(300, msec);
+				hook.stop();
+				inchDriveP(20);
+				gyroTurn(136); //140 was a little too much
+				inchDriveP(-60); //drive up to 2nd stake (try to figure out how to slow down right at stake?)
+				clamp.set(true);
+				gyroTurn(180);
+				intake.spin(reverse, 80, pct);
+				hook.spin(reverse, 80, pct);
+				driveRobot(60,60, 1300); //intake rings 4 and 5 //1300  for both
+				driveBrake();
+				inchDriveP(-10);
+				gyroTurn(-315); //face corner (test this part wasn't working last time)
+				clamp.set(false);
+				inchDriveP(-16); //push stake in corner
+				hook.spin(forward, 80, pct);
+				wait(300, msec);
+				//SKILLS AUTON
+				/*wait(1000, msec);
 				inchDriveP(-10.5);
 				clamp.set(true); //grabbed clamp
 				intake.spin(reverse, 100, pct); 
@@ -483,7 +476,7 @@ void autonomous(void) {
 				clamp.set(false);
 				inchDriveP(9);   // these are meant to
 				inchDriveP(-9);  // shake the mobile goal off
-				inchDriveP(12);
+				inchDriveP(12);*/
 
 
 
@@ -497,12 +490,12 @@ void autonomous(void) {
 				break;
 
 
-			}*/
+			}
 			
 
 // ..........................................................................
   // ..........................................................................
-}
+}/*
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -556,7 +549,7 @@ void usercontrol(void) {
 
 	
 	
-	if (Controller1.ButtonL2.pressing()){
+	if (Controller1.ButtonDown.pressing()){
 		if(!(Sweep_count)){
 			Sweep_count=true;
 		}else if(Sweep_count){
